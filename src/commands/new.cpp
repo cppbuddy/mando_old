@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace fs = std::filesystem;
+#include "init.hpp"
 
 namespace new_package {
 
@@ -23,7 +23,7 @@ void missing_path() {
 void folder_exists(const std::string& path) {
   std::cout << "\033[0;31merror: \033[0m";
   std::cout << "destination ";
-  std::cout << fs::canonical(path);
+  std::cout << std::filesystem::canonical(path);
   std::cout << " already exists\n\n";
   std::cout << "Use `mando init` to initialize the directory." << std::endl;
   exit(1);
@@ -37,10 +37,13 @@ void run(const std::vector<std::string>& arguments) {
 
   const auto& path = arguments.at(1);
 
-  if (fs::exists(path) && fs::is_directory(path)) {
+  if (std::filesystem::exists(path) && std::filesystem::is_directory(path)) {
     error::folder_exists(path);
   } else {
-    fs::create_directories(path);
+    std::filesystem::path folder_path = path;
+
+    std::filesystem::create_directories(folder_path);
+    init::package(folder_path);
 
     std::cout << "\033[1;32m    Created \033[0m";
     std::cout << "binary (application) `";
